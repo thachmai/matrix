@@ -3,7 +3,7 @@ coursera = 1
 # Please fill out this stencil and submit using the provided submission script.
 
 
-
+from random import randint
 
 
 ## 1: (Task 1) Movie Review
@@ -13,7 +13,7 @@ def movie_review(name):
     Input: the name of a movie
     Output: a string (one of the review options), selected at random using randint
     """
-    return ...
+    return ['Rotten!', 'Precious!', 'Pirate it!'][randint(0,2)]
 
 
 
@@ -32,7 +32,16 @@ def makeInverseIndex(strlist):
     >>> makeInverseIndex(['hello world','hello','hello cat','hellolot of cats']) == {'hello': {0, 1, 2}, 'cat': {2}, 'of': {3}, 'world': {0}, 'cats': {3}, 'hellolot': {3}}
     True
     """
-    pass
+    result = {} 
+    for (index, str) in enumerate(strlist):
+        words = str.split()
+        for w in words:
+            if result.get(w):
+                result[w].add(index)
+            else:
+                result[w] = {index}
+
+    return result
 
 
 
@@ -49,8 +58,11 @@ def orSearch(inverseIndex, query):
     >>> orSearch(idx, ['Johann', 'Carl'])
     {0, 2, 3, 4, 5}
     """
-    pass
+    result = set()
+    for word in inverseIndex.keys() & set(query):
+        result = result | inverseIndex[word]
 
+    return result
 
 
 ## 4: (Task 4) And Search
@@ -66,5 +78,8 @@ def andSearch(inverseIndex, query):
     >>> andSearch(idx, ['Johann', 'Bach'])
     {0, 4}
     """
-    pass
+    result = set()
+    for word in inverseIndex.keys() & set(query):
+        result = inverseIndex[word] if len(result) == 0 else (result & inverseIndex[word])
 
+    return result
