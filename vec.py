@@ -15,7 +15,7 @@ def getitem(v,k):
     >>> v['b']
     0
     """
-    pass
+    return v.f[k] if k in v.f else 0
 
 def setitem(v,k,val):
     """
@@ -34,7 +34,7 @@ def setitem(v,k,val):
     >>> v['a']
     0
     """
-    pass
+    v.f[k] = val
 
 def equal(u,v):
     """
@@ -64,7 +64,13 @@ def equal(u,v):
 
     """
     assert u.D == v.D
-    pass
+    for k in u.D:
+       a = u.f[k] if k in u.f else 0 
+       b = v.f[k] if k in v.f else 0
+       if a != b:
+           return False
+
+    return True
 
 def add(u,v):
     """
@@ -90,7 +96,8 @@ def add(u,v):
     True
     """
     assert u.D == v.D
-    pass
+    f = {k: ((u.f[k] if k in u.f else 0) + (v.f[k] if k in v.f else 0)) for k in u.D}
+    return Vec(u.D, f)
 
 def dot(u,v):
     """
@@ -121,7 +128,7 @@ def dot(u,v):
     12
     """
     assert u.D == v.D
-    pass
+    return sum([(u.f[k] if k in u.f else 0) * (v.f[k] if k in v.f else 0) for k in u.D])
 
 def scalar_mul(v, alpha):
     """
@@ -138,7 +145,7 @@ def scalar_mul(v, alpha):
     >>> u == Vec({'x','y','z','w'},{'x':1,'y':2,'z':3,'w':4})
     True
     """
-    pass
+    return Vec(v.D, {k: alpha * v.f[k] for k in v.f})
 
 def neg(v):
     """
@@ -153,7 +160,7 @@ def neg(v):
     True
 
     """
-    pass
+    return Vec(v.D, {k: -v.f[k] for k in v.f})
 
 ###############################################################################################################################
 
