@@ -39,7 +39,7 @@ def create_voting_dict(strlist):
     The lists for each senator should preserve the order listed in voting data.
     In case you're feeling clever, this can be done in one line.
     """
-    pass
+    return {s[0]:[int(x) for x in s[3:len(s)]] for s in map(lambda x: x.split(), strlist)}
 
 
 
@@ -61,7 +61,7 @@ def policy_compare(sen_a, sen_b, voting_dict):
         
     You should definitely try to write this in one line.
     """
-    pass
+    return sum([a * b for (a,b) in zip(voting_dict[sen_a], voting_dict[sen_b])])
 
 
 
@@ -80,9 +80,10 @@ def most_similar(sen, voting_dict):
 
     Note that you can (and are encouraged to) re-use you policy_compare procedure.
     """
-    
-    return ""
-
+    sens = {s : policy_compare(sen, s, voting_dict) for s in voting_dict if sen != s}
+    m = max([sens[s] for s in sens])
+    for s in sens:
+        if (sens[s] == m): return s
 
 
 ## 4: (Task 4) Least Similar
@@ -97,13 +98,15 @@ def least_similar(sen, voting_dict):
         >>> least_similar('a', vd)
         'c'
     """
-    pass
-
+    sens = {s : policy_compare(sen, s, voting_dict) for s in voting_dict if sen != s}
+    m = min([sens[s] for s in sens])
+    for s in sens:
+        if (sens[s] == m): return s
 
 
 ## 5: (Task 5) Chafee, Santorum
-most_like_chafee    = ''
-least_like_santorum = '' 
+most_like_chafee    = 'Jeffords'
+least_like_santorum = 'Feingold' 
 
 
 
@@ -122,9 +125,19 @@ def find_average_similarity(sen, sen_set, voting_dict):
         >>> vd == {'Klein':[1,1,1], 'Fox-Epstein':[1,-1,0], 'Ravella':[-1,0,0], 'Oyakawa':[-1,-1,-1], 'Loery':[0,1,1]}
         True
     """
-    return ...
+    compares = [ policy_compare(sen, s, voting_dict) for s in sen_set]
+    return float(sum(compares)) / len(compares)
 
-most_average_Democrat = ... # give the last name (or code that computes the last name)
+f = open('voting_record_dump109.txt')
+votings = list(f)
+vd = create_voting_dict(votings)
+dems = { v[0] for v in map(lambda x: x.split(), votings) if v[1] == 'D' } 
+dems_avg = { d : find_average_similarity(d, {dd for dd in dems if dd != d}, vd) for d in dems }
+max_dem = max([dems_avg[d] for d in dems_avg])
+
+most_average_Democrat = ''
+for d in dems_avg:
+    most_average_Democrat = d if dems_avg[d] == max_dem else most_average_Democrat 
 
 
 
@@ -151,9 +164,9 @@ def find_average_record(sen_set, voting_dict):
         >>> find_average_record({'a'}, d)
         [0.0, 1.0, 1.0]
     """
-    return ...
+    return [float(sum([voting_dict[s][i] for s in sen_set])) / len(sen_set) for i in range(len(list(voting_dict.values())[0]))]
 
-average_Democrat_record = ... # give the vector as a list
+average_Democrat_record = find_average_record(dems, vd)
 
 
 
@@ -170,5 +183,15 @@ def bitter_rivals(voting_dict):
         >>> br == ('Fox-Epstein', 'Ravella') or br == ('Ravella', 'Fox-Epstein')
         True
     """
-    return (..., ...)
+    max_diff = 0
+    result = ('', '')
+    for s in voting_dict:
+        rest = { ss for ss in voting_dict if ss != s }
+        for ss in rest:
+            dot = sum([a * b for (a,b) in zip(voting_dict[s], voting_dict[ss])])
+            if dot < max_diff:
+                max_diff = dot
+                result = (s, ss)
+    
+    return result
 
